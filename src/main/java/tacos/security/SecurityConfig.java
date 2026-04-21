@@ -1,8 +1,11 @@
 package tacos.security;
 
 import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
@@ -19,11 +22,12 @@ import tacos.data.UserRepository;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-//    @Bean
-//    public WebSecurityCustomizer webSecurityCustomizer() {
-//        return (web) -> web.ignoring().requestMatchers("/h2-console/**");
-//    }
-   @Bean
+
+    //    @Bean
+    //    public WebSecurityCustomizer webSecurityCustomizer() {
+    //        return (web) -> web.ignoring().requestMatchers("/h2-console/**");
+    //    }
+    @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
@@ -31,7 +35,7 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepo){
        return (username) -> {
-           if (userRepo.findByUsername(username) == null) {
+           if (userRepo.findByUsername("belial") == null) {
                userRepo.save(new RegistrationForm("belial", "password", "", ""
                        , "", "", "", "").toUser(passwordEncoder()));
            }
@@ -51,8 +55,9 @@ public class SecurityConfig {
         http.csrf(csrf->csrf.ignoringRequestMatchers(toH2Console()).disable());
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/","/login","/register").permitAll()
-                .requestMatchers("/design","/orders").hasRole("USER"));
-                http.formLogin().loginPage("/login").defaultSuccessUrl("/");
+                .requestMatchers("/design","/orders","/orders/**","/api/tacos/**").hasRole("USER"));
+        http.httpBasic(Customizer.withDefaults());
+        http.formLogin(form -> form.loginPage("/login").defaultSuccessUrl("/"));
         return http.build();
    }
 

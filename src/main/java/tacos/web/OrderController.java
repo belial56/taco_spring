@@ -39,6 +39,7 @@ public class OrderController {
                                @AuthenticationPrincipal User user){
 
         if(error.hasErrors()){
+            System.out.println(error);
             return "orderForm";
         }
 
