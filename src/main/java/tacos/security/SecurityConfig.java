@@ -55,7 +55,8 @@ public class SecurityConfig {
         http.csrf(csrf->csrf.ignoringRequestMatchers(toH2Console()).disable());
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/","/login","/register").permitAll()
-                .requestMatchers("/design","/orders","/orders/**","/api/tacos/**").hasRole("USER"));
+//                .requestMatchers("/design","/orders","/orders/**","/api/tacos/**").hasRole("USER"));
+                .requestMatchers("/**").hasRole("USER"));
         http.httpBasic(Customizer.withDefaults());
         http.formLogin(form -> form.loginPage("/login").defaultSuccessUrl("/"));
         return http.build();
