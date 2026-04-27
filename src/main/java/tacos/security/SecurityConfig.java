@@ -3,11 +3,15 @@ package tacos.security;
 import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,6 +26,20 @@ import tacos.data.UserRepository;
 @EnableMethodSecurity
 public class SecurityConfig {
 
+
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+//        return http.authorizeHttpRequests(
+//            auth ->
+//                    auth.requestMatchers(HttpMethod.POST, "/api/ingredients")
+//                            .hasAuthority("SCOPE_writeIngredients")
+//                            .requestMatchers(HttpMethod.DELETE, "/api/ingredients")
+//                            .hasAuthority("SCOPE_deleteIngredients")
+//                )
+//                .oauth2ResourceServer(
+//                        oauth2 -> oauth2.jwt(Customizer.withDefaults())
+//        ).build();
+//    }
 
     //    @Bean
     //    public WebSecurityCustomizer webSecurityCustomizer() {
@@ -54,11 +72,19 @@ public class SecurityConfig {
                         headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
         http.csrf(csrf->csrf.ignoringRequestMatchers(toH2Console()).disable());
         http.authorizeHttpRequests(authorize -> authorize
+                .requestMatchers(HttpMethod.POST, "/api/ingredients")
+                        .hasAuthority("SCOPE_writeIngredients")
+                        .requestMatchers(HttpMethod.DELETE, "/api/ingredients")
+                        .hasAuthority("SCOPE_deleteIngredients")
                 .requestMatchers("/","/login","/register").permitAll()
 //                .requestMatchers("/design","/orders","/orders/**","/api/tacos/**").hasRole("USER"));
                 .requestMatchers("/**").hasRole("USER"));
         http.httpBasic(Customizer.withDefaults());
         http.formLogin(form -> form.loginPage("/login").defaultSuccessUrl("/"));
+
+        http.oauth2ResourceServer(
+                oauth2 -> oauth2.jwt(Customizer.withDefaults())
+        );
         return http.build();
    }
 
