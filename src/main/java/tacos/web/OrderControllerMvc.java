@@ -20,11 +20,11 @@ import java.util.Date;
 @Controller
 @RequestMapping("/orders")
 @SessionAttributes("tacoOrder")
-public class OrderController {
+public class OrderControllerMvc {
 
     private OrderRepository orderRepo;
 
-    public OrderController(OrderRepository orderRepo){
+    public OrderControllerMvc(OrderRepository orderRepo){
         this.orderRepo = orderRepo;
     }
 

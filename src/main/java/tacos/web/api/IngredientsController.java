@@ -1,6 +1,7 @@
 package tacos.web.api;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tacos.data.IngredientRepository;
 import tacos.data.OrderRepository;
@@ -24,12 +25,14 @@ public class IngredientsController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Ingredient aveIngredient(@RequestBody Ingredient ingredient){
+    @PreAuthorize("hasAuthority('SCOPE_admin')")
+    public Ingredient saveIngredient(@RequestBody Ingredient ingredient){
         return ingredientRepo.save(ingredient);
     }
 
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAnyAuthority('SCOPE_admin')")
     public void deleteIngredient(@PathVariable("id") String id){
         ingredientRepo.deleteById(id);
     }

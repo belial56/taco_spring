@@ -1,16 +1,13 @@
-package tacos.model;
+package com.kor4a.tacocloudclient.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import lombok.*;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
-@Entity
+@AllArgsConstructor
 public class Ingredient {
-    @Id
+
     private String id;
 
     private String name;
@@ -20,4 +17,5 @@ public class Ingredient {
     public enum Type {
         WRAP, PROTEIN, VEGGIES, CHEESE, SAUCE
     }
+
 }

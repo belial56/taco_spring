@@ -1,17 +1,11 @@
 package tacos.security;
 
-import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -67,14 +61,17 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-        http.authorizeHttpRequests(auth -> auth.requestMatchers(toH2Console()).permitAll())
-                .headers(headers ->
-                        headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
-        http.csrf(csrf->csrf.ignoringRequestMatchers(toH2Console()).disable());
+//        http.authorizeHttpRequests(auth -> auth.requestMatchers(toH2Console()).permitAll())
+//                .headers(headers ->
+//                        headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
+        http.csrf(csrf->csrf.ignoringRequestMatchers("/h2-console/**").disable());
+        http.headers(headers -> headers.frameOptions(
+                frame ->frame.sameOrigin()));
         http.authorizeHttpRequests(authorize -> authorize
+                .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/ingredients")
                         .hasAuthority("SCOPE_writeIngredients")
-                        .requestMatchers(HttpMethod.DELETE, "/api/ingredients")
+                .requestMatchers(HttpMethod.DELETE, "/api/ingredients")
                         .hasAuthority("SCOPE_deleteIngredients")
                 .requestMatchers("/","/login","/register").permitAll()
 //                .requestMatchers("/design","/orders","/orders/**","/api/tacos/**").hasRole("USER"));
