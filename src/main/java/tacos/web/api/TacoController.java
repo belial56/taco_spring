@@ -48,9 +48,8 @@ public class TacoController {
 
     @DeleteMapping("/id")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasAuthority('SCOPE_admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteTaco(@PathVariable("id" ) Long id){
         tacoRepo.deleteById(id);
     }
-
 }

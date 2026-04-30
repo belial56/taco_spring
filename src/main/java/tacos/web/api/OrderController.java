@@ -4,10 +4,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import tacos.data.OrderRepository;
-import tacos.model.Taco;
 import tacos.model.TacoOrder;
-import tacos.web.OrderControllerMvc;
+import tacos.service.OrderService;
 
 import java.util.Optional;
 
@@ -15,15 +13,17 @@ import java.util.Optional;
 @RequestMapping("/api/orders")
 public class OrderController {
 
-    private final OrderRepository orderRepository;
+//    private final OrderRepository orderRepository;
+    private final OrderService orderService;
 
-    public OrderController(OrderRepository orderRepository){
-        this.orderRepository = orderRepository;
+    public OrderController(OrderService orderService){
+        this.orderService = orderService;
     }
 
     @GetMapping(path = "/{id}",consumes = "application/json")
     public ResponseEntity<TacoOrder> getOrder(@PathVariable("id") Long id){
-        Optional<TacoOrder> order = orderRepository.findById(id);
+
+        Optional<TacoOrder> order = orderService.findById(id);
         if (order.isPresent()){
             return new ResponseEntity<TacoOrder>(order.get(), HttpStatus.OK);
         }
@@ -33,7 +33,7 @@ public class OrderController {
     @PostMapping(consumes = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
     public TacoOrder postOrder(@RequestBody TacoOrder order){
-        return  orderRepository.save(order);
+        return  orderService.save(order);
     }
 
     @PutMapping(path = "/{id}", consumes = "application/json")
@@ -41,7 +41,7 @@ public class OrderController {
             @PathVariable("id") Long id,
             @RequestBody TacoOrder order){
         order.setId(id);
-        return orderRepository.save(order);
+        return orderService.save(order);
     }
 
     @PatchMapping(path = "/{id}", consumes = "application/json")
@@ -49,7 +49,7 @@ public class OrderController {
             @PathVariable("id") Long id,
             @RequestBody TacoOrder patch
     ){
-        TacoOrder order = orderRepository.findById(id).get();
+        TacoOrder order = orderService.findById(id).get();
         if (patch.getDeliveryName() != null){
             order.setDeliveryName(patch.getDeliveryName());
         }
@@ -74,15 +74,13 @@ public class OrderController {
         if (patch.getCcCVV() != null){
             order.setCcCVV(patch.getCcCVV());
         }
-        return orderRepository.save(order);
+        return orderService.save(order);
     }
 
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteOrder(@PathVariable("id") Long id){
-        try {
-            orderRepository.deleteById(id);
-        } catch (EmptyResultDataAccessException e) {};
+        orderService.deleteOrder(id);
     }
 }
 
