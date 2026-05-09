@@ -7,8 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import tacos.DTO.TacoDTO;
 import tacos.data.TacoRepository;
-import tacos.model.Taco;
+import tacos.utils.converter.TacoMapper;
 
 import java.util.Optional;
 
@@ -19,21 +20,23 @@ import java.util.Optional;
 public class TacoController {
 
     private final TacoRepository tacoRepo;
+    private final TacoMapper mapper;
 
-    public TacoController(TacoRepository tacoRepo){
+    public TacoController(TacoRepository tacoRepo, TacoMapper mapper){
         this.tacoRepo = tacoRepo;
+        this.mapper = mapper;
     }
 
     @GetMapping(params = "recent")
-    public Iterable<Taco> recentTacos(){
+    public Iterable<TacoDTO> recentTacos(){
         PageRequest page = PageRequest.of(0,12,
                 Sort.by("CreatedAt").descending());
-        return tacoRepo.findAll(page).getContent();
+        return tacoRepo.findAll(page).getContent().stream().map(mapper::toDto).toList();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Taco> tacoById(@PathVariable("id") Long id){
-        Optional<Taco> taco = tacoRepo.findById(id);
+    public ResponseEntity<TacoDTO> tacoById(@PathVariable("id") Long id){
+        Optional<TacoDTO> taco = tacoRepo.findById(id).map(t -> mapper.toDto(t));
         if (taco.isPresent()) {
             return new ResponseEntity<>(taco.get(), HttpStatus.OK);
         }
@@ -42,8 +45,8 @@ public class TacoController {
 
     @PostMapping(consumes = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
-    public Taco postTaco(@RequestBody Taco taco) {
-        return tacoRepo.save(taco);
+    public TacoDTO postTaco(@RequestBody TacoDTO taco) {
+        return mapper.toDto(tacoRepo.save(mapper.toEntity(taco)));
     }
 
     @DeleteMapping("/id")

@@ -1,6 +1,5 @@
 package tacos.DTO;
 
-import tacos.model.Taco;
 import tacos.model.User;
 
 import java.util.Date;
@@ -17,6 +16,6 @@ public record OrderDTO(
     String ccNumber,
     String ccExpiration,
     String ccCVV,
-    List<Taco> tacos,
+    List<TacoDTO> tacos,
     User user
 ){}

@@ -3,9 +3,9 @@ package tacos.web.api;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import tacos.DTO.IngredientDTO;
 import tacos.data.IngredientRepository;
-import tacos.data.OrderRepository;
-import tacos.model.Ingredient;
+import tacos.utils.converter.IngredientMapper;
 
 @RestController
 @RequestMapping(path = "/api/ingredients", produces = "application/json")
@@ -13,21 +13,23 @@ import tacos.model.Ingredient;
 public class IngredientsController {
 
     private final IngredientRepository ingredientRepo;
+    private final IngredientMapper mapper;
 
-    public IngredientsController(IngredientRepository ingredientRepo){
+    public IngredientsController(IngredientRepository ingredientRepo, IngredientMapper mapper){
         this.ingredientRepo = ingredientRepo;
+        this.mapper = mapper;
     }
 
     @GetMapping
-    public Iterable<Ingredient> allIngredients(){
-        return ingredientRepo.findAll();
+    public Iterable<IngredientDTO> allIngredients(){
+        return ingredientRepo.findAll().stream().map(mapper::toDto).toList();
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMIN')")
-    public Ingredient saveIngredient(@RequestBody Ingredient ingredient){
-        return ingredientRepo.save(ingredient);
+    public IngredientDTO saveIngredient(@RequestBody IngredientDTO ingredient){
+        return mapper.toDto(ingredientRepo.save(mapper.toEntity(ingredient)));
     }
 
     @DeleteMapping("{id}")
