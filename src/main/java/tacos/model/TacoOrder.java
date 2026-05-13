@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.validator.constraints.CreditCardNumber;
 
 import java.io.Serializable;
@@ -17,6 +15,9 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class TacoOrder implements Serializable {
 
   private static final Long serialVersionUID = 1L;
@@ -59,6 +60,9 @@ public class TacoOrder implements Serializable {
   private User user;
 
   public void addTaco(Taco taco){
+    if(this.tacos == null){
+      this.tacos = new ArrayList<>();
+    }
       this.tacos.add(taco);
   }
 

@@ -21,6 +21,12 @@ public class OrderService {
        return orderRepository.save(order);
     }
 
+    public TacoOrder save (TacoOrder input, Long id){
+        var order = input;
+        order.setId(id);
+        return orderRepository.save(order);
+    }
+
     public Iterable<TacoOrder> findAll(){
         return orderRepository.findAll();
     }
@@ -33,5 +39,35 @@ public class OrderService {
         try {
             orderRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e) {};
+    }
+
+    public TacoOrder updateOrder(Long id, TacoOrder patch){
+        TacoOrder order = findById(id).get();
+        if (patch.getDeliveryName() != null){
+            order.setDeliveryName(patch.getDeliveryName());
+        }
+        if (patch.getDeliveryStreet() != null){
+            order.setDeliveryStreet(patch.getDeliveryStreet());
+        }
+        if (patch.getDeliveryCity() != null){
+            order.setDeliveryCity(patch.getDeliveryCity());
+        }
+        if (patch.getDeliveryState() != null){
+            order.setDeliveryState(patch.getDeliveryState());
+        }
+        if (patch.getDeliveryZip() != null){
+            order.setDeliveryZip(patch.getDeliveryZip());
+        }
+        if (patch.getCcNumber() != null){
+            order.setCcNumber(patch.getCcNumber());
+        }
+        if (patch.getCcExpiration() != null){
+            order.setCcExpiration(patch.getCcExpiration());
+        }
+        if (patch.getCcCVV() != null){
+            order.setCcCVV(patch.getCcCVV());
+        }
+        return save(order);
+
     }
 }

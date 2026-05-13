@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
+import tacos.DTO.OrderDTO;
 import tacos.data.OrderRepository;
 import tacos.model.TacoOrder;
 import tacos.model.User;
+import tacos.utils.converter.TacoOrderMapper;
 
 import java.util.Date;
 
@@ -22,10 +24,12 @@ import java.util.Date;
 @SessionAttributes("tacoOrder")
 public class OrderControllerMvc {
 
-    private OrderRepository orderRepo;
+    private final OrderRepository orderRepo;
+    private final TacoOrderMapper orderMapper;
 
-    public OrderControllerMvc(OrderRepository orderRepo){
+    public OrderControllerMvc(OrderRepository orderRepo, TacoOrderMapper orderMapper) {
         this.orderRepo = orderRepo;
+        this.orderMapper = orderMapper;
     }
 
     @GetMapping("/current")
@@ -34,7 +38,7 @@ public class OrderControllerMvc {
     }
 
     @PostMapping
-    public String processOrder(@Valid TacoOrder order, Errors error,
+    public String processOrder(@Valid OrderDTO orderDto, Errors error,
                                SessionStatus sessionStatus,
                                @AuthenticationPrincipal User user){
 
@@ -42,6 +46,8 @@ public class OrderControllerMvc {
             System.out.println(error);
             return "orderForm";
         }
+
+        TacoOrder order = orderMapper.toEntity(orderDto);
 
         order.setPlacedAt(new Date());
         order.setUser(user);

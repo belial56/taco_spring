@@ -34,49 +34,26 @@ public class OrderController {
 
     @PostMapping(consumes = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
-    public TacoOrder postOrder(@RequestBody TacoOrder order){
-        return  orderService.save(order);
+    public OrderDTO postOrder(@RequestBody OrderDTO order){
+        return  mapper.toDto(orderService.save(mapper.toEntity(order)));
     }
 
     @PutMapping(path = "/{id}", consumes = "application/json")
-    public TacoOrder putOrder(
+    public OrderDTO putOrder(
             @PathVariable("id") Long id,
-            @RequestBody TacoOrder order){
-        order.setId(id);
-        return orderService.save(order);
+            @RequestBody OrderDTO order){
+
+        return mapper.toDto(orderService.save(mapper.toEntity(order), id));
     }
 
     @PatchMapping(path = "/{id}", consumes = "application/json")
-    public TacoOrder patchOrder(
+    public OrderDTO patchOrder(
             @PathVariable("id") Long id,
-            @RequestBody TacoOrder patch
+            @RequestBody OrderDTO patch
     ){
-        TacoOrder order = orderService.findById(id).get();
-        if (patch.getDeliveryName() != null){
-            order.setDeliveryName(patch.getDeliveryName());
-        }
-        if (patch.getDeliveryStreet() != null){
-            order.setDeliveryStreet(patch.getDeliveryStreet());
-        }
-        if (patch.getDeliveryCity() != null){
-            order.setDeliveryCity(patch.getDeliveryCity());
-        }
-        if (patch.getDeliveryState() != null){
-            order.setDeliveryState(patch.getDeliveryState());
-        }
-        if (patch.getDeliveryZip() != null){
-            order.setDeliveryZip(patch.getDeliveryZip());
-        }
-        if (patch.getCcNumber() != null){
-            order.setCcNumber(patch.getCcNumber());
-        }
-        if (patch.getCcExpiration() != null){
-            order.setCcExpiration(patch.getCcExpiration());
-        }
-        if (patch.getCcCVV() != null){
-            order.setCcCVV(patch.getCcCVV());
-        }
-        return orderService.save(order);
+        return mapper.toDto(
+                orderService.updateOrder(id, mapper.toEntity(patch))
+        );
     }
 
     @DeleteMapping(path = "/{id}")

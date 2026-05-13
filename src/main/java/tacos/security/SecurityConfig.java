@@ -64,7 +64,7 @@ public class SecurityConfig {
 //        http.authorizeHttpRequests(auth -> auth.requestMatchers(toH2Console()).permitAll())
 //                .headers(headers ->
 //                        headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
-        http.csrf(csrf->csrf.ignoringRequestMatchers("/h2-console/**").disable());
+//        http.csrf(csrf->csrf.ignoringRequestMatchers("/h2-console/**").disable());
         http.headers(headers -> headers.frameOptions(
                 frame ->frame.sameOrigin()));
         http.authorizeHttpRequests(authorize -> authorize

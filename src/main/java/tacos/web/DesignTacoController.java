@@ -7,11 +7,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
+import tacos.DTO.OrderDTO;
+import tacos.DTO.TacoDTO;
 import tacos.model.Ingredient;
 import tacos.model.Ingredient.Type;
 import tacos.data.IngredientRepository;
 import tacos.model.Taco;
 import tacos.model.TacoOrder;
+import tacos.utils.converter.TacoMapper;
+import tacos.utils.converter.TacoOrderMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,12 +27,19 @@ import java.util.stream.Collectors;
 public class DesignTacoController {
 
     private final IngredientRepository ingredientRepo;
+    private final TacoMapper tacoMapper;
+    private final TacoOrderMapper orderMapper;
+
 
     @Autowired
     public DesignTacoController(
-            IngredientRepository ingredientRepo
+            IngredientRepository ingredientRepo,
+            TacoMapper tacoMapper,
+            TacoOrderMapper orderMapper
     ){
         this.ingredientRepo = ingredientRepo;
+        this.tacoMapper = tacoMapper;
+        this.orderMapper = orderMapper;
     }
 
     @ModelAttribute
@@ -44,13 +55,13 @@ public class DesignTacoController {
     }
 
     @ModelAttribute("tacoOrder")
-    public TacoOrder order(){
-        return new TacoOrder();
+    public OrderDTO order(){
+        return orderMapper.toDto(new TacoOrder());
     }
 
     @ModelAttribute(name = "taco")
-    public Taco taco(){
-        return new Taco();
+    public TacoDTO taco(){
+        return tacoMapper.toDto(new Taco());
     }
 
     @GetMapping
@@ -59,13 +70,14 @@ public class DesignTacoController {
     }
 
     @PostMapping
-    public String processTaco(@Valid Taco taco, Errors error,
-                              @ModelAttribute TacoOrder tacoOrder){
+    public String processTaco(@Valid TacoDTO taco, Errors error,
+                              @ModelAttribute OrderDTO tacoOrder){
         if (error.hasErrors()){
             return "design";
         }
-        tacoOrder.addTaco(taco);
-        log.info("Processing taco: {}", taco);
+        TacoOrder order = orderMapper.toEntity(tacoOrder);
+        order.addTaco(tacoMapper.toEntity(taco));
+        log.info("Processing taco: {}", taco.id());
         return "redirect:/orders/current";
     }
 
